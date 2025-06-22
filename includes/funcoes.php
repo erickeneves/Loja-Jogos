@@ -1,5 +1,4 @@
 <?php
-// includes/funcoes.php
 
 /**
  * Formata um valor monetário
