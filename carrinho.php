@@ -58,7 +58,7 @@ if (isset($_GET['remover'])) {
             ?>
             <tr>
                 <td><?= $item['nome'] ?></td>
-                <td>R$ <?= number_format($item['preco'], 2, ',', '.') ?></td>
+                <td>R$ <?= echo formatarMoeda(29.90); // R$ 29,90</td>
                 <td><?= $item['quantidade'] ?></td>
                 <td>R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
                 <td><a href="carrinho.php?remover=<?= $id ?>">Remover</a></td>
