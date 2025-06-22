@@ -16,7 +16,7 @@ function formatarMoeda($valor) {
  * @return string
  */
 function formatarData($data, $incluirHora = false) {
-    if (empty($data) return '';
+    if (empty($data)) return '';
     
     $timestamp = strtotime($data);
     if ($incluirHora) {
