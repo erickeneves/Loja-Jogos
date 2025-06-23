@@ -25,12 +25,12 @@ $sql = "SELECT
             p.nome AS plataforma,
             jp.valor_diaria,
             jp.quantidade_estoque,
-            GROUP_CONCAT(g.nome SEPARATOR ', ') AS generos
+            GROUP_CONCAT(g.nome SEPARATOR ', ') AS gêneros
         FROM jogos j
         JOIN jogo_plataforma jp ON j.id_jogo = jp.id_jogo
         JOIN plataformas p ON jp.id_plataforma = p.id_plataforma
-        LEFT JOIN jogo_genero jg ON j.id_jogo = jg.id_jogo
-        LEFT JOIN generos g ON jg.id_genero = g.id_genero
+        LEFT JOIN jogo_gênero jg ON j.id_jogo = jg.id_jogo
+        LEFT JOIN gêneros g ON jg.id_genero = g.id_genero
         WHERE j.id_jogo = :id_jogo 
           AND jp.id_plataforma = :id_plataforma
         GROUP BY j.id_jogo, jp.id_plataforma";
@@ -135,7 +135,7 @@ $tituloPagina = $produto['titulo'] . ' - ' . $produto['plataforma'];
                 <p><?= nl2br(htmlspecialchars($produto['descricao'])) ?></p>
                 
                 <h3 class="mt-4">Gêneros</h3>
-                <p><?= htmlspecialchars($produto['generos'] ?? 'Não informado') ?></p>
+                <p><?= htmlspecialchars($produto['gêneros'] ?? 'Não informado') ?></p>
             </div>
             <div class="col-md-4">
                 <div class="card">

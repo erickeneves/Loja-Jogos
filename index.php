@@ -19,12 +19,14 @@ $produtos = $pdo->query($sql)->fetchAll();
 <html>
 <body>
     <?= exibirMensagemFlash() ?>
+
+<div class=containier>
+    <h2>Jogos Disponíveis:</h2>
     
     <div class="produtos">
         <?php foreach ($produtos as $produto): ?>
             <div class="produto">
                 <h3><?= htmlspecialchars($produto['titulo']) ?></h3>
-                <!-- Adicione esta linha para mostrar a plataforma -->
                 <p>Plataforma: <?= htmlspecialchars($produto['plataforma_nome']) ?></p>
                 <p><?= formatarMoeda($produto['valor_diaria']) ?></p>
                 <a href="produto.php?id_jogo=<?= $produto['id_jogo'] ?>&id_plataforma=<?= $produto['id_plataforma'] ?>">
@@ -33,5 +35,6 @@ $produtos = $pdo->query($sql)->fetchAll();
             </div>
         <?php endforeach; ?>
     </div>
+</div>
 </body>
 </html>
