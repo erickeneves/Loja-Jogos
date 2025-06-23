@@ -27,7 +27,7 @@ $produtos = $pdo->query($sql)->fetchAll();
                 <!-- Adicione esta linha para mostrar a plataforma -->
                 <p>Plataforma: <?= htmlspecialchars($produto['plataforma_nome']) ?></p>
                 <p><?= formatarMoeda($produto['valor_diaria']) ?></p>
-                <a href="produto.php?id_jogo=<?= $produto['id_jogo'] ?>&id_plataforma=<?= $produto['id_plataforma'] ?>&slug=<?= gerarSlug($produto['titulo']) ?>">
+                <a href="produto.php?id_jogo=<?= $produto['id_jogo'] ?>&id_plataforma=<?= $produto['id_plataforma'] ?>">
                     Ver detalhes
                 </a>
             </div>

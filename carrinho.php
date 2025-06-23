@@ -10,7 +10,7 @@ if ($_POST['acao'] == 'adicionar') {
     $quantidade = $_POST['quantidade'];
     
     // Buscar produto no banco
-    $stmt = $pdo->prepare("SELECT * FROM Produtos WHERE produto_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM jogos WHERE produto_id = ?");
     $stmt->execute([$produto_id]);
     $produto = $stmt->fetch();
     
