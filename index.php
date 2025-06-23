@@ -3,13 +3,14 @@ include 'includes/conexao.php';
 include 'includes/funcoes.php';
 
 $sql = "SELECT 
-            jp.*, 
-            j.titulo, 
-            p.nome AS plataforma_nome
-        FROM jogo_plataforma jp
-        JOIN jogos j ON jp.id_jogo = j.id_jogo
-        JOIN plataformas p ON jp.id_plataforma = p.id_plataforma
-        WHERE jp.quantidade_estoque > 0";
+            j.id_jogo,
+            j.titulo,
+            MIN(jp.valor_diaria) AS menor_preco,
+            COUNT(DISTINCT jp.id_plataforma) AS plataformas_disponiveis
+        FROM jogos j
+        JOIN jogo_plataforma jp ON j.id_jogo = jp.id_jogo
+        WHERE jp.quantidade_estoque > 0
+        GROUP BY j.id_jogo";
         
 $produtos = $pdo->query($sql)->fetchAll();
 ?>
@@ -21,8 +22,6 @@ $produtos = $pdo->query($sql)->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameRent - Aluguel de Jogos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="..css/indexprodutos.css">
-    
     <style>
         .produtos {
             display: grid;
@@ -42,7 +41,7 @@ $produtos = $pdo->query($sql)->fetchAll();
         }
         .produto-imagem {
             width: 100%;
-            height: 200px;
+            height: 500px;
             object-fit: cover;
         }
         .produto-body {
@@ -52,6 +51,16 @@ $produtos = $pdo->query($sql)->fetchAll();
             font-weight: bold;
             color: #198754;
             font-size: 1.2rem;
+        }
+        .produto-imagem:hover .wrapper::before,
+        .wrapper::after{
+            opacity: 1;
+        }
+        .produto-imagem:hover .wrapper::after{
+            height: 120px;
+        }
+        .produto-imagem:hover .title {
+            transform: translate3d(0%, -50px, 100px);
         }
     </style>
 </head>
@@ -63,18 +72,18 @@ $produtos = $pdo->query($sql)->fetchAll();
         
         <div class="produtos">
             <?php foreach ($produtos as $produto): 
-                // Mapeia os nomes dos jogos para os arquivos de imagem
+                // Formatar o nome da imagem
                 $imagemJogo = strtolower(str_replace([' ', ':'], ['_', ''], $produto['titulo'])) . '.png';
                 $caminhoImagem = file_exists("img/$imagemJogo") ? "img/$imagemJogo" : "img/sem_imagem.png";
             ?>
                 <div class="produto-card">
-                    <img src="<?= $caminhoImagem ?>" alt="<?= htmlspecialchars($produto['titulo']) ?>" class="produto-imagem">
+                    <img src="<?= $caminhoImagem ?>" alt="<?= htmlspecialchars($produto['titulo']) ?>" class="produto-imagem" id="card">
                     <div class="produto-body">
                         <h3><?= htmlspecialchars($produto['titulo']) ?></h3>
-                        <p class="text-muted">Plataforma: <?= htmlspecialchars($produto['plataforma_nome']) ?></p>
-                        <p class="preco-destaque"><?= formatarMoeda($produto['valor_diaria']) ?> <small class="text-muted">/dia</small></p>
-                        <a href="produto.php?id_jogo=<?= $produto['id_jogo'] ?>&id_plataforma=<?= $produto['id_plataforma'] ?>" class="btn btn-primary">
-                            Ver detalhes
+                        <p class="preco-destaque">A partir de <?= formatarMoeda($produto['menor_preco']) ?> <small class="text-muted">/dia</small></p>
+                        <p class="text-muted">Disponível em <?= $produto['plataformas_disponiveis'] ?> plataforma(s)</p>
+                        <a href="produto.php?id_jogo=<?= $produto['id_jogo'] ?>" class="btn btn-primary">
+                            Ver detalhes e plataformas
                         </a>
                     </div>
                 </div>
