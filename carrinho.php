@@ -1,77 +1,91 @@
 <?php
-include 'includes/funcoes.php';
-
 session_start();
-include 'includes/conexao.php';
+include 'includes/funcoes.php';
+include 'header.php';
 
-// Adicionar item ao carrinho
-if ($_POST['acao'] == 'adicionar') {
-    $produto_id = $_POST['produto_id'];
-    $quantidade = $_POST['quantidade'];
-    
-    // Buscar produto no banco
-    $stmt = $pdo->prepare("SELECT * FROM jogos WHERE produto_id = ?");
-    $stmt->execute([$produto_id]);
-    $produto = $stmt->fetch();
-    
-    // Adicionar à sessão
-    $_SESSION['carrinho'][$produto_id] = [
-        'nome' => $produto['nome'],
-        'preco' => $produto['preco'],
-        'quantidade' => $quantidade
-    ];
-    
-    header("Location: carrinho.php");
-    exit;
+// Verifica se o carrinho existe
+$carrinho = $_SESSION['carrinho'] ?? [];
+$total = 0;
+
+// Processar remoção de item
+if (isset($_GET['remover'])) {
+    $indice = (int)$_GET['remover'];
+    if (isset($carrinho[$indice])) {
+        unset($carrinho[$indice]);
+        $_SESSION['carrinho'] = array_values($carrinho); // Reindexa o array
+    }
 }
 
-// Remover item do carrinho
-if (isset($_GET['remover'])) {
-    unset($_SESSION['carrinho'][$_GET['remover']]);
-    header("Location: carrinho.php");
-    exit;
+// Processar atualização de dias
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar'])) {
+    foreach ($_POST['dias'] as $indice => $dias) {
+        if (isset($carrinho[$indice])) {
+            $dias = max(1, min(7, (int)$dias)); // Limita entre 1 e 7 dias
+            $carrinho[$indice]['dias'] = $dias;
+        }
+    }
+    $_SESSION['carrinho'] = $carrinho;
+}
+
+// Calcular total
+foreach ($carrinho as $item) {
+    $total += $item['valor_diaria'] * $item['dias'];
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<body>
-    <h2>Seu Carrinho</h2>
-    
-    <?php if (empty($_SESSION['carrinho'])): ?>
-        <p>Carrinho vazio</p>
-    <?php else: ?>
-        <table>
-            <tr>
-                <th>Produto</th>
-                <th>Preço</th>
-                <th>Quantidade</th>
-                <th>Total</th>
-                <th>Ações</th>
-            </tr>
-            
-            <?php 
-            $total = 0;
-            foreach ($_SESSION['carrinho'] as $id => $item): 
-                $subtotal = $item['preco'] * $item['quantidade'];
-                $total += $subtotal;
-            ?>
-            <tr>
-                <td><?= $item['nome'] ?></td>
-                <td>R$ <?= echo formatarMoeda(29.90); // R$ 29,90</td>
-                <td><?= $item['quantidade'] ?></td>
-                <td>R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
-                <td><a href="carrinho.php?remover=<?= $id ?>">Remover</a></td>
-            </tr>
-            <?php endforeach; ?>
-            
-            <tr>
-                <td colspan="3">Total</td>
-                <td>R$ <?= number_format($total, 2, ',', '.') ?></td>
-            </tr>
+<h1 class="mb-4">Seu Carrinho</h1>
+
+<?php if (empty($carrinho)): ?>
+    <div class="alert alert-info">Seu carrinho está vazio.</div>
+<?php else: ?>
+    <form method="post">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Jogo</th>
+                    <th>Plataforma</th>
+                    <th>Valor Diário</th>
+                    <th>Dias</th>
+                    <th>Subtotal</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($carrinho as $indice => $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['titulo']) ?></td>
+                        <td><?= htmlspecialchars($item['plataforma']) ?></td>
+                        <td><?= formatarMoeda($item['valor_diaria']) ?></td>
+                        <td>
+                            <input type="number" name="dias[<?= $indice ?>]" 
+                                   value="<?= $item['dias'] ?>" 
+                                   min="1" max="7" class="form-control" style="width: 80px;">
+                        </td>
+                        <td><?= formatarMoeda($item['valor_diaria'] * $item['dias']) ?></td>
+                        <td>
+                            <a href="carrinho.php?remover=<?= $indice ?>" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                    <td colspan="2"><strong><?= formatarMoeda($total) ?></strong></td>
+                </tr>
+            </tfoot>
         </table>
         
-        <a href="finalizar.php">Finalizar Compra</a>
-    <?php endif; ?>
-</body>
-</html>
+        <div class="d-flex justify-content-between">
+            <a href="index.php" class="btn btn-secondary">Continuar Comprando</a>
+            <div>
+                <button type="submit" name="atualizar" class="btn btn-info">Atualizar Carrinho</button>
+                <a href="finalizar.php" class="btn btn-success">Finalizar Aluguel</a>
+            </div>
+        </div>
+    </form>
+<?php endif; ?>
+
+<?php include 'footer.php'; ?>

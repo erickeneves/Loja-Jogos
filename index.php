@@ -1,6 +1,8 @@
 <?php
 include 'includes/conexao.php';
 include 'includes/funcoes.php';
+include 'header.php';
+
 
 $sql = "SELECT 
             j.id_jogo,
@@ -90,6 +92,7 @@ $produtos = $pdo->query($sql)->fetchAll();
             <?php endforeach; ?>
         </div>
     </div>
+<?php include 'footer.php';?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

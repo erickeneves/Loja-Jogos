@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 
 include 'includes/conexao.php';
 include 'includes/funcoes.php';
+include 'header.php';
 
 $id_jogo = $_GET['id_jogo'] ?? null;
 
@@ -172,7 +173,7 @@ $tituloPagina = $jogo['titulo'];
             </div>
         </div>
     </div>
-
+<?php include 'footer.php';?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
