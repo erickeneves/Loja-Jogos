@@ -1,6 +1,6 @@
 <?php
-session_start();
 include 'includes/funcoes.php';
+include 'header.php';
 
 // Verifica se o carrinho está vazio
 if (empty($_SESSION['carrinho'])) {
@@ -12,8 +12,6 @@ if (empty($_SESSION['carrinho'])) {
 
 // Limpa o carrinho após finalizar
 unset($_SESSION['carrinho']);
-
-include 'header.php';
 ?>
 
 <div class="container py-5 text-center">
@@ -28,3 +26,4 @@ include 'header.php';
     
     <a href="index.php" class="btn btn-primary">Voltar à Loja</a>
 </div>
+<?php include 'footer.php';?>

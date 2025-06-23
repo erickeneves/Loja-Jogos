@@ -1,111 +1,84 @@
 <?php
-session_start();
-include 'includes/conexao.php';
 include 'includes/funcoes.php';
 
-$erro = '';
+// Se o usuário já está logado, redireciona
+if (isset($_SESSION['usuario'])) {
+    redirect('index.php');
+}
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $senha = $_POST['senha'];
+// Processar login
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'] ?? '';
+    $senha = $_POST['senha'] ?? '';
     
-    // Buscar cliente pelo email
-    $stmt = $pdo->prepare("SELECT * FROM Clientes WHERE email = ?");
-    $stmt->execute([$email]);
-    $cliente = $stmt->fetch();
-    
-    if ($cliente && password_verify($senha, $cliente['senha'])) {
-        // Login bem sucedido
-        $_SESSION['cliente_id'] = $cliente['cliente_id'];
-        $_SESSION['cliente_nome'] = $cliente['nome'];
-        
-        // Redirecionar para página anterior ou home
-        $redirect = $_SESSION['redirect_to'] ?? 'index.php';
-        unset($_SESSION['redirect_to']);
-        
-        redirect($redirect, 'Login realizado com sucesso!');
+    // Validação básica
+    if (empty($email) || empty($senha)) {
+        $erro = "Por favor, preencha todos os campos.";
     } else {
-        $erro = "Email ou senha incorretos";
+        include 'includes/conexao.php';
+        $sql = "SELECT id_cliente, nome, email, senha FROM clientes WHERE email = :email";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':email' => $email]);
+        $usuario = $stmt->fetch();
+        
+        if ($usuario && password_verify($senha, $usuario['senha'])) {
+            $_SESSION['usuario'] = [
+                'id' => $usuario['id_cliente'],
+                'nome' => $usuario['nome'],
+                'email' => $usuario['email']
+            ];
+            redirect('index.php', 'Login realizado com sucesso!');
+        } else {
+            $erro = "Email ou senha incorretos.";
+        }
     }
 }
+
+include 'header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h2 class="text-center mb-4">Login</h2>
-        
-        <?= exibirMensagemFlash() ?>
-        
-        <?php if (!empty($erro)): ?>
-            <div class="alert alert-danger"><?= $erro ?></div>
-        <?php endif; ?>
-        
-        <form id="formLogin" method="post" novalidate>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required
-                       value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
-                <div class="invalid-feedback">Por favor, informe seu email.</div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow">
+                <div class="row g-0">
+                    <div class="col-md-6 d-none d-md-block">
+                        <img src="img/banner.jpg" alt="GameRent" class="img-fluid h-100" style="object-fit: cover;">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body p-5">
+                            <h2 class="card-title text-center mb-4">Login de Usuário</h2>
+                            
+                            <?php if (isset($erro)): ?>
+                                <div class="alert alert-danger"><?= $erro ?></div>
+                            <?php endif; ?>
+                            
+                            <form method="post">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="senha" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="senha" name="senha" required>
+                                </div>
+                                
+                                <div class="d-grid mb-3">
+                                    <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <p class="mb-0">Não tem uma conta? <a href="registro.php">Registre-se</a></p>
+                                    <p class="mt-3"><a href="admin/login_admin.php">Acesso de administrador</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="mb-3">
-                <label for="senha" class="form-label">Senha</label>
-                <input type="password" class="form-control" id="senha" name="senha" required>
-                <div class="invalid-feedback">Por favor, informe sua senha.</div>
-            </div>
-            
-            <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
-            </div>
-            
-            <div class="text-center">
-                <p>Ainda não tem conta? <a href="registro.php">Crie uma agora</a></p>
-                <p><a href="recuperar_senha.php">Esqueceu sua senha?</a></p>
-            </div>
-        </form>
+        </div>
     </div>
+</div>
 
-    <script>
-        // Validação do formulário no cliente
-        document.getElementById('formLogin').addEventListener('submit', function(event) {
-            let formValido = true;
-            
-            if (!document.getElementById('email').value.trim()) {
-                document.getElementById('email').classList.add('is-invalid');
-                formValido = false;
-            } else {
-                document.getElementById('email').classList.remove('is-invalid');
-            }
-            
-            if (!document.getElementById('senha').value) {
-                document.getElementById('senha').classList.add('is-invalid');
-                formValido = false;
-            } else {
-                document.getElementById('senha').classList.remove('is-invalid');
-            }
-            
-            if (!formValido) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        });
-    </script>
-</body>
-</html>
+<?php include 'footer.php'; ?>

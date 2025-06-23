@@ -132,8 +132,16 @@ function redirect($url, $mensagem = null, $tipo = 'success') {
         $_SESSION['flash_mensagem'] = $mensagem;
         $_SESSION['flash_tipo'] = $tipo;
     }
-    header("Location: $url");
-    exit;
+    
+    // Verifica se os headers já foram enviados
+    if (!headers_sent()) {
+        header("Location: $url");
+        exit;
+    } else {
+        // Fallback com JavaScript se os headers já foram enviados
+        echo "<script>window.location.href='$url';</script>";
+        exit;
+    }
 }
 
 /**
