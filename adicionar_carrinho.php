@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'includes/funcoes.php';
+include 'header.php';
 
 // Verifica se os parâmetros foram enviados
 if (!isset($_GET['id_jogo'], $_GET['id_plataforma'])) {
@@ -30,26 +31,17 @@ if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
 
-// Verifica se o item já está no carrinho
-$itemExistente = false;
-foreach ($_SESSION['carrinho'] as &$item) {
-    if ($item['id_jogo'] == $id_jogo && $item['id_plataforma'] == $id_plataforma) {
-        $item['dias'] += 1; // Adiciona mais um dia
-        $itemExistente = true;
-        break;
-    }
-}
+// Adiciona ao carrinho
+$_SESSION['carrinho'][] = [
+    'id_jogo' => $id_jogo,
+    'id_plataforma' => $id_plataforma,
+    'titulo' => $produto['titulo'],
+    'plataforma' => $produto['plataforma'],
+    'valor_diaria' => (float)$produto['valor_diaria'],
+    'dias' => 1 // Define 1 dia como padrão
+];
 
-// Se não existir, adiciona novo item
-if (!$itemExistente) {
-    $_SESSION['carrinho'][] = [
-        'id_jogo' => $id_jogo,
-        'id_plataforma' => $id_plataforma,
-        'titulo' => $produto['titulo'],
-        'plataforma' => $produto['plataforma'],
-        'valor_diaria' => (float)$produto['valor_diaria'],
-        'dias' => 1
-    ];
-}
-
-redirect('carrinho.php', 'Jogo adicionado ao carrinho!');
+// Mensagem de sucesso
+redirect('produto.php?id_jogo=' . $id_jogo, 'Jogo adicionado ao carrinho! Você pode continuar escolhendo mais jogos.');
+include 'footer.php';
+?>

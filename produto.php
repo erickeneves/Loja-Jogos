@@ -101,6 +101,7 @@ $tituloPagina = $jogo['titulo'];
 </head>
 <body>
     <div class="container py-4">
+        <?= exibirMensagemFlash() ?>
         <div class="jogo-header">
             <div class="row">
                 <div class="col-md-4">
@@ -154,7 +155,8 @@ $tituloPagina = $jogo['titulo'];
                                     </div>
                                     <div class="col-md-3 text-end">
                                         <?php if ($plataforma['quantidade_estoque'] > 0): ?>
-                                            <a href="alugar.php?id_jogo=<?= $id_jogo ?>&id_plataforma=<?= $plataforma['id_plataforma'] ?>" class="btn btn-primary">
+                                            <a href="adicionar_carrinho.php?id_jogo=<?= $id_jogo ?>&id_plataforma=<?= $plataforma['id_plataforma'] ?>" 
+                                            class="btn btn-primary">
                                                 Alugar
                                             </a>
                                         <?php else: ?>
