@@ -1,253 +1,125 @@
 <?php
 session_start();
-include '../includes/conexao.php';
-include '../includes/funcoes.php';
+include 'includes/conexao.php';
+include 'includes/funcoes.php';
 
-// Verificar se é admin
-if (!isset($_SESSION['admin_logado'])) {
-    redirect('login_admin.php');
+// Captura os parâmetros da URL
+$id_jogo = $_GET['id_jogo'] ?? null;
+$id_plataforma = $_GET['id_plataforma'] ?? null; // Adicione este parâmetro
+
+// Valida os parâmetros
+if (!$id_jogo || !$id_plataforma) {
+    header('Location: index.php');
+    exit;
 }
 
-$erro = '';
-$sucesso = '';
-$produtoEdit = null;
+// Consulta para obter detalhes do produto específico
+$sql = "SELECT 
+            j.id_jogo,
+            j.titulo,
+            j.descricao,
+            j.ano_lancamento,
+            j.faixa_etaria,
+            p.id_plataforma,
+            p.nome AS plataforma_nome,
+            jp.valor_diaria,
+            jp.quantidade_estoque,
+            GROUP_CONCAT(g.nome SEPARATOR ', ') AS generos
+        FROM jogos j
+        JOIN jogo_plataforma jp ON j.id_jogo = jp.id_jogo
+        JOIN plataformas p ON jp.id_plataforma = p.id_plataforma
+        LEFT JOIN jogo_genero jg ON j.id_jogo = jg.id_jogo
+        LEFT JOIN generos g ON jg.id_genero = g.id_genero
+        WHERE j.id_jogo = :id_jogo 
+          AND p.id_plataforma = :id_plataforma
+        GROUP BY j.id_jogo, p.id_plataforma";
 
-// Buscar categorias
-$categorias = $pdo->query("SELECT * FROM Categorias")->fetchAll();
+$stmt = $pdo->prepare($sql);
+$stmt->execute([
+    ':id_jogo' => $id_jogo,
+    ':id_plataforma' => $id_plataforma
+]);
+$produto = $stmt->fetch();
 
-// Se estiver editando, buscar o produto
-if (isset($_GET['editar'])) {
-    $stmt = $pdo->prepare("SELECT * FROM Produtos WHERE produto_id = ?");
-    $stmt->execute([$_GET['editar']]);
-    $produtoEdit = $stmt->fetch();
+// Se não encontrou o produto, redireciona
+if (!$produto) {
+    header('Location: index.php');
+    exit;
 }
 
-// Processar formulário
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nome = $_POST['nome'];
-    $descricao = $_POST['descricao'];
-    $preco = (float) $_POST['preco'];
-    $estoque = (int) $_POST['estoque'];
-    $categoria_id = (int) $_POST['categoria_id'];
-    $produto_id = $_POST['produto_id'] ?? null;
-    
-    // Validações
-    $erros = [];
-    
-    if (empty($nome)) $erros[] = "Nome do produto é obrigatório";
-    if (empty($descricao)) $erros[] = "Descrição é obrigatória";
-    if ($preco <= 0) $erros[] = "Preço deve ser maior que zero";
-    if ($estoque < 0) $erros[] = "Estoque não pode ser negativo";
-    if ($categoria_id <= 0) $erros[] = "Selecione uma categoria válida";
-    
-    if (empty($erros)) {
-        try {
-            if ($produto_id) {
-                // Atualizar produto existente
-                $stmt = $pdo->prepare("UPDATE Produtos SET 
-                                      nome = ?, 
-                                      descricao = ?, 
-                                      preco = ?, 
-                                      estoque = ?, 
-                                      categoria_id = ? 
-                                      WHERE produto_id = ?");
-                $stmt->execute([$nome, $descricao, $preco, $estoque, $categoria_id, $produto_id]);
-                $sucesso = "Produto atualizado com sucesso!";
-            } else {
-                // Criar novo produto
-                $stmt = $pdo->prepare("INSERT INTO Produtos 
-                                      (nome, descricao, preco, estoque, categoria_id) 
-                                      VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$nome, $descricao, $preco, $estoque, $categoria_id]);
-                $sucesso = "Produto adicionado com sucesso!";
-            }
-        } catch (PDOException $e) {
-            $erro = "Erro ao salvar produto: " . $e->getMessage();
-        }
-    } else {
-        $erro = implode("<br>", $erros);
-    }
-}
-
-// Excluir produto
-if (isset($_GET['excluir'])) {
-    try {
-        $stmt = $pdo->prepare("DELETE FROM Produtos WHERE produto_id = ?");
-        $stmt->execute([$_GET['excluir']]);
-        $sucesso = "Produto excluído com sucesso!";
-    } catch (PDOException $e) {
-        $erro = "Erro ao excluir produto: " . $e->getMessage();
-    }
-}
-
-// Listar produtos
-$produtos = $pdo->query("SELECT p.*, c.nome AS categoria_nome 
-                         FROM Produtos p
-                         JOIN Categorias c ON p.categoria_id = c.categoria_id
-                         ORDER BY p.produto_id DESC")->fetchAll();
+// Definir o título da página
+$tituloPagina = $produto['titulo'] . ' - ' . $produto['plataforma_nome'];
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciar Produtos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($tituloPagina) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .card-form {
-            margin-bottom: 30px;
+        .jogo-imagem {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .jogo-detalhes {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <?php include 'includes/navbar.php'; ?>
+
     <div class="container py-4">
-        <h1 class="mb-4">Gerenciar Produtos</h1>
-        
-        <?php if ($sucesso): ?>
-            <div class="alert alert-success"><?= $sucesso ?></div>
-        <?php endif; ?>
-        
-        <?php if ($erro): ?>
-            <div class="alert alert-danger"><?= $erro ?></div>
-        <?php endif; ?>
-        
-        <div class="card card-form">
-            <div class="card-header">
-                <h2 class="h5"><?= $produtoEdit ? 'Editar Produto' : 'Adicionar Novo Produto' ?></h2>
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Imagem do jogo - se tivéssemos uma coluna de imagem, seria aqui -->
+                <div class="bg-light border rounded p-4 text-center">
+                    <p>Imagem não disponível</p>
+                </div>
             </div>
-            <div class="card-body">
-                <form id="formProduto" method="post">
-                    <?php if ($produtoEdit): ?>
-                        <input type="hidden" name="produto_id" value="<?= $produtoEdit['produto_id'] ?>">
+            <div class="col-md-6">
+                <h1><?= htmlspecialchars($produto['titulo']) ?></h1>
+                <p class="lead"><?= htmlspecialchars($produto['plataforma_nome']) ?></p>
+                <p class="h4 text-success"><?= formatarMoeda($produto['valor_diaria']) ?> <small class="text-muted">/ dia</small></p>
+                
+                <div class="mt-4">
+                    <?php if ($produto['quantidade_estoque'] > 0): ?>
+                        <p class="text-success">Disponível em estoque</p>
+                        <form action="alugar.php" method="post" class="mt-3">
+                            <input type="hidden" name="id_jogo" value="<?= $produto['id_jogo'] ?>">
+                            <input type="hidden" name="id_plataforma" value="<?= $produto['id_plataforma'] ?>">
+                            
+                            <div class="mb-3">
+                                <label for="dias" class="form-label">Dias de aluguel:</label>
+                                <input type="number" class="form-control" id="dias" name="dias" min="1" max="7" value="1" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Alugar Agora</button>
+                        </form>
+                    <?php else: ?>
+                        <p class="text-danger">Produto esgotado</p>
                     <?php endif; ?>
-                    
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome do Produto</label>
-                        <input type="text" class="form-control" id="nome" name="nome" 
-                               value="<?= $produtoEdit['nome'] ?? '' ?>" required>
-                        <div class="invalid-feedback">Por favor, informe o nome do produto.</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label">Descrição</label>
-                        <textarea class="form-control" id="descricao" name="descricao" rows="3" required><?= $produtoEdit['descricao'] ?? '' ?></textarea>
-                        <div class="invalid-feedback">Por favor, informe a descrição do produto.</div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="preco" class="form-label">Preço (R$)</label>
-                            <input type="number" step="0.01" class="form-control" id="preco" name="preco" 
-                                   value="<?= $produtoEdit['preco'] ?? '' ?>" min="0.01" required>
-                            <div class="invalid-feedback">Por favor, informe um preço válido.</div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="estoque" class="form-label">Estoque</label>
-                            <input type="number" class="form-control" id="estoque" name="estoque" 
-                                   value="<?= $produtoEdit['estoque'] ?? '0' ?>" min="0" required>
-                            <div class="invalid-feedback">Por favor, informe a quantidade em estoque.</div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="categoria_id" class="form-label">Categoria</label>
-                        <select class="form-select" id="categoria_id" name="categoria_id" required>
-                            <option value="">Selecione uma categoria</option>
-                            <?php foreach ($categorias as $categoria): ?>
-                                <option value="<?= $categoria['categoria_id'] ?>" 
-                                    <?= ($produtoEdit && $produtoEdit['categoria_id'] == $categoria['categoria_id']) ? 'selected' : '' ?>>
-                                    <?= $categoria['nome'] ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <div class="invalid-feedback">Por favor, selecione uma categoria.</div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                    <?php if ($produtoEdit): ?>
-                        <a href="produtos.php" class="btn btn-secondary">Cancelar</a>
-                    <?php endif; ?>
-                </form>
+                </div>
+                
+                <div class="jogo-detalhes">
+                    <h3>Detalhes</h3>
+                    <p><strong>Gêneros:</strong> <?= htmlspecialchars($produto['generos'] ?? 'Não informado') ?></p>
+                    <p><strong>Ano de lançamento:</strong> <?= $produto['ano_lancamento'] ?></p>
+                    <p><strong>Classificação:</strong> <?= $produto['faixa_etaria'] ?></p>
+                </div>
             </div>
         </div>
         
-        <div class="card">
-            <div class="card-header">
-                <h2 class="h5">Lista de Produtos</h2>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Preço</th>
-                                <th>Estoque</th>
-                                <th>Categoria</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($produtos as $produto): ?>
-                                <tr>
-                                    <td><?= $produto['produto_id'] ?></td>
-                                    <td><?= htmlspecialchars($produto['nome']) ?></td>
-                                    <td><?= formatarMoeda($produto['preco']) ?></td>
-                                    <td><?= $produto['estoque'] ?></td>
-                                    <td><?= htmlspecialchars($produto['categoria_nome']) ?></td>
-                                    <td>
-                                        <a href="produtos.php?editar=<?= $produto['produto_id'] ?>" 
-                                           class="btn btn-sm btn-warning">Editar</a>
-                                        <a href="produtos.php?excluir=<?= $produto['produto_id'] ?>" 
-                                           class="btn btn-sm btn-danger" 
-                                           onclick="return confirm('Tem certeza que deseja excluir este produto?')">Excluir</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Descrição</h3>
+                <p><?= nl2br(htmlspecialchars($produto['descricao'])) ?></p>
             </div>
         </div>
     </div>
 
-    <script>
-        // Validação do formulário
-        document.getElementById('formProduto').addEventListener('submit', function(event) {
-            let formValido = true;
-            
-            if (!document.getElementById('nome').value.trim()) {
-                document.getElementById('nome').classList.add('is-invalid');
-                formValido = false;
-            }
-            
-            if (!document.getElementById('descricao').value.trim()) {
-                document.getElementById('descricao').classList.add('is-invalid');
-                formValido = false;
-            }
-            
-            if (document.getElementById('preco').value <= 0) {
-                document.getElementById('preco').classList.add('is-invalid');
-                formValido = false;
-            }
-            
-            if (document.getElementById('estoque').value < 0) {
-                document.getElementById('estoque').classList.add('is-invalid');
-                formValido = false;
-            }
-            
-            if (!document.getElementById('categoria_id').value) {
-                document.getElementById('categoria_id').classList.add('is-invalid');
-                formValido = false;
-            }
-            
-            if (!formValido) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        });
-    </script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
