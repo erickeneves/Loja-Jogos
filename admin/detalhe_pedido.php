@@ -1,20 +1,16 @@
-<?php
-include '../includes/funcoes.php'; // Inclui as funções
-
-// ... [código para buscar pedido e itens] ...
+<!--<?php
+include '../includes/funcoes.php';
 
 ?>
 <!DOCTYPE html>
 <html>
 <body>
-    <!-- Informações do pedido -->
+
     <p><strong>Data:</strong> <?= formatarData($pedido['data_pedido'], true) ?></p>
     <p><strong>Total:</strong> <?= formatarMoeda($pedido['valor_total']) ?></p>
     
-    <!-- Endereço -->
     <p><strong>CEP:</strong> <?= formatarCEP($pedido['cep']) ?></p>
     
-    <!-- Tabela de itens -->
     <table class="table">
         <thead>
             <tr>

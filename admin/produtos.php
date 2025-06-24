@@ -1,22 +1,18 @@
 <?php
-// Adicione no TOPO do produto.php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include 'includes/conexao.php';
 include 'includes/funcoes.php';
 
-// Captura os parâmetros da URL
 $id_jogo = $_GET['id_jogo'] ?? null;
 $id_plataforma = $_GET['id_plataforma'] ?? null;
 
-// Valida os IDs
 if (!$id_jogo || !$id_plataforma || !is_numeric($id_jogo) || !is_numeric($id_plataforma)) {
     header('Location: index.php');
     exit;
 }
 
-// Consulta corrigida com nomes de tabela em minúsculas
 $sql = "SELECT 
             j.id_jogo,
             j.titulo,
@@ -34,7 +30,7 @@ $sql = "SELECT
         LEFT JOIN gêneros g ON jg.id_genero = g.id_genero
         WHERE j.id_jogo = :id_jogo 
           AND jp.id_plataforma = :id_plataforma
-        GROUP BY j.id_jogo, jp.id_plataforma"; // Correção crucial aqui!
+        GROUP BY j.id_jogo, jp.id_plataforma";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
@@ -43,13 +39,11 @@ $stmt->execute([
 ]);
 $produto = $stmt->fetch();
 
-// Se não encontrou o produto, redireciona
 if (!$produto) {
     header('Location: index.php');
     exit;
 }
 
-// Definir o título da página
 $tituloPagina = $produto['titulo'] . ' - ' . $produto['plataforma'];
 ?>
 <!DOCTYPE html>
@@ -92,7 +86,6 @@ $tituloPagina = $produto['titulo'] . ' - ' . $produto['plataforma'];
         <div class="jogo-header">
             <div class="row">
                 <div class="col-md-4">
-                    <!-- Espaço para imagem - você pode adicionar depois -->
                     <div class="bg-light border rounded d-flex align-items-center justify-content-center" style="height: 300px;">
                         <span class="text-muted">Imagem do jogo</span>
                     </div>

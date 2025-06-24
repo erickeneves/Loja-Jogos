@@ -2,11 +2,9 @@
 include 'includes/funcoes.php';
 include 'header.php';
 
-// Verifica se o carrinho existe
 $carrinho = $_SESSION['carrinho'] ?? [];
 $total = 0;
 
-// Processar remoção de item
 if (isset($_GET['remover'])) {
     $indice = (int)$_GET['remover'];
     if (isset($carrinho[$indice])) {
@@ -15,18 +13,16 @@ if (isset($_GET['remover'])) {
     }
 }
 
-// Processar atualização de dias
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar'])) {
     foreach ($_POST['dias'] as $indice => $dias) {
         if (isset($carrinho[$indice])) {
-            $dias = max(1, min(7, (int)$dias)); // Limita entre 1 e 7 dias
+            $dias = max(1, min(7, (int)$dias));
             $carrinho[$indice]['dias'] = $dias;
         }
     }
     $_SESSION['carrinho'] = $carrinho;
 }
 
-// Calcular total
 foreach ($carrinho as $item) {
     $total += $item['valor_diaria'] * $item['dias'];
 }
@@ -58,7 +54,6 @@ foreach ($carrinho as $item) {
                     </thead>
                     <tbody>
                         <?php foreach ($carrinho as $indice => $item): 
-                            // Formatar nome da imagem
                             $imagemJogo = strtolower(str_replace([' ', ':'], ['_', ''], $item['titulo'])) . '.png';
                             $caminhoImagem = file_exists("img/primary/$imagemJogo") ? "img/primary/$imagemJogo" : "img/sem_imagem.png";
                         ?>
@@ -116,7 +111,6 @@ foreach ($carrinho as $item) {
 <?php include 'footer.php'; ?>
 
 <style>
-    /* Estilos específicos para o carrinho */
     .bg-purple {
         background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
     }

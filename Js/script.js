@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             let valid = true;
             
-            // Validação simples
             const inputs = this.querySelectorAll('input[required], select[required], textarea[required]');
             inputs.forEach(input => {
                 if (!input.value.trim()) {
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Atualizar total no carrinho
     function atualizarTotal() {
         let total = 0;
         document.querySelectorAll('.item-total').forEach(el => {
@@ -33,11 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('total-geral').textContent = 'R$ ' + total.toFixed(2);
     }
     
-    // Se estiver na página do carrinho
     if (document.querySelector('.carrinho')) {
         atualizarTotal();
         
-        // Atualizar dias
         document.querySelectorAll('.input-dias').forEach(input => {
             input.addEventListener('change', function() {
                 const index = this.dataset.index;

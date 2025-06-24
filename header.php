@@ -4,7 +4,6 @@ session_start();
 $base_url = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/';
 $base_url = rtrim($base_url, '/') . '/';
 
-// Obter contagem de itens no carrinho
 $carrinho_count = 0;
 if (isset($_SESSION['carrinho']) && is_array($_SESSION['carrinho'])) {
     $carrinho_count = count($_SESSION['carrinho']);

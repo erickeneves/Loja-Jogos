@@ -2,15 +2,10 @@
 include 'includes/funcoes.php';
 include 'header.php';
 
-// Verifica se o carrinho está vazio
 if (empty($_SESSION['carrinho'])) {
     redirect('index.php', 'Seu carrinho está vazio.', 'warning');
 }
 
-// Aqui você implementaria a lógica de salvar no banco de dados
-// Para simplificar, apenas exibiremos uma mensagem de sucesso
-
-// Limpa o carrinho após finalizar
 unset($_SESSION['carrinho']);
 ?>
 

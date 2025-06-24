@@ -2,12 +2,10 @@
 include 'includes/funcoes.php';
 include 'includes/conexao.php';
 
-// Se o usuário já está logado, redireciona
 if (isset($_SESSION['usuario'])) {
     redirect('index.php');
 }
 
-// Processar registro
 $erros = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['nome'] ?? '');
@@ -16,10 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'] ?? '';
     $confirmar_senha = $_POST['confirmar_senha'] ?? '';
     
-    // Limpar e validar CPF
     $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
     
-    // Validações
     if (empty($nome)) $erros[] = "Nome é obrigatório.";
     if (empty($cpf_limpo)) $erros[] = "CPF é obrigatório.";
     elseif (strlen($cpf_limpo) !== 11) $erros[] = "CPF deve conter 11 dígitos.";
@@ -30,17 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (strlen($senha) < 6) $erros[] = "Senha deve ter pelo menos 6 caracteres.";
     elseif ($senha !== $confirmar_senha) $erros[] = "As senhas não coincidem.";
     
-    // Verificar se CPF já existe
     $stmt = $pdo->prepare("SELECT id_cliente FROM clientes WHERE cpf = ?");
     $stmt->execute([$cpf_limpo]);
     if ($stmt->fetch()) $erros[] = "Este CPF já está cadastrado.";
     
-    // Verificar se email já existe
     $stmt = $pdo->prepare("SELECT id_cliente FROM clientes WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetch()) $erros[] = "Este email já está cadastrado.";
     
-    // Se não há erros, cadastrar
     if (empty($erros)) {
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
         

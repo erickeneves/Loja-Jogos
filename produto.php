@@ -9,7 +9,6 @@ if (!$id_jogo || !is_numeric($id_jogo)) {
     exit;
 }
 
-// Consulta para obter informações gerais do jogo
 $sqlJogo = "SELECT 
             j.id_jogo,
             j.titulo,
@@ -32,7 +31,6 @@ if (!$jogo) {
     exit;
 }
 
-// Consulta para obter as plataformas disponíveis para este jogo
 $sqlPlataformas = "SELECT 
             jp.id_plataforma,
             p.nome AS plataforma_nome,

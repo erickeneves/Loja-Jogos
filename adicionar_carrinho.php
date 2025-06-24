@@ -2,7 +2,6 @@
 include 'includes/funcoes.php';
 include 'header.php';
 
-// Verifica se os parâmetros foram enviados
 if (!isset($_GET['id_jogo'], $_GET['id_plataforma'])) {
     redirect('index.php', 'Parâmetros inválidos.', 'danger');
 }
@@ -10,7 +9,6 @@ if (!isset($_GET['id_jogo'], $_GET['id_plataforma'])) {
 $id_jogo = (int)$_GET['id_jogo'];
 $id_plataforma = (int)$_GET['id_plataforma'];
 
-// Busca informações do jogo
 include 'includes/conexao.php';
 $sql = "SELECT j.titulo, p.nome AS plataforma, jp.valor_diaria
         FROM jogos j
@@ -25,22 +23,18 @@ if (!$produto) {
     redirect('index.php', 'Produto não encontrado.', 'danger');
 }
 
-// Inicializa o carrinho se não existir
 if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
 
-// Adiciona ao carrinho
 $_SESSION['carrinho'][] = [
     'id_jogo' => $id_jogo,
     'id_plataforma' => $id_plataforma,
     'titulo' => $produto['titulo'],
     'plataforma' => $produto['plataforma'],
     'valor_diaria' => (float)$produto['valor_diaria'],
-    'dias' => 1 // Define 1 dia como padrão
+    'dias' => 1 
 ];
-
-// Mensagem de sucesso
 redirect('produto.php?id_jogo=' . $id_jogo, 'Jogo adicionado ao carrinho! Você pode continuar escolhendo mais jogos.');
 include 'footer.php';
 ?>

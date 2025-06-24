@@ -2,7 +2,6 @@
 include 'includes/funcoes.php';
 
 session_start();
-// Verificar se o usuário está logado como admin
 if (!isset($_SESSION['admin_logado'])) {
     header('Location: login_admin.php');
     exit;
@@ -10,14 +9,12 @@ if (!isset($_SESSION['admin_logado'])) {
 
 include '../includes/conexao.php';
 
-// Atualizar status do pedido
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['pedido_id'])) {
     $stmt = $pdo->prepare("UPDATE Pedidos SET status = ? WHERE pedido_id = ?");
     $stmt->execute([$_POST['status'], $_POST['pedido_id']]);
     $mensagem = "Status do pedido atualizado!";
 }
 
-// Buscar todos os pedidos com informações do cliente
 $pedidos = $pdo->query("
     SELECT p.*, c.nome AS cliente_nome 
     FROM Pedidos p

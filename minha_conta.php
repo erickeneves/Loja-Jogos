@@ -1,7 +1,5 @@
 <?php
-include 'includes/funcoes.php'; // Inclui as funções
-
-// ... [código para buscar cliente e pedidos] ...
+include 'includes/funcoes.php';
 
 ?>
 <!DOCTYPE html>

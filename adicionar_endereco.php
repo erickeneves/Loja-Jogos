@@ -3,7 +3,6 @@ session_start();
 include 'includes/conexao.php';
 include 'includes/funcoes.php';
 
-// Verificar se o cliente está logado
 if (!isset($_SESSION['cliente_id'])) {
     redirect('login.php', 'Por favor, faça login para adicionar um endereço.');
 }
@@ -20,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $estado = $_POST['estado'];
     $tipo = $_POST['tipo'];
     
-    // Validações
     $erros = [];
     
     if (empty($cep)) $erros[] = "CEP é obrigatório";
@@ -186,7 +184,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-        // Formatar CEP enquanto digita
         function formatarCEPCampo(input) {
             let value = input.value.replace(/\D/g, '');
             if (value.length > 8) value = value.substring(0, 8);
@@ -197,7 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             input.value = value;
         }
         
-        // Validação do formulário
         document.getElementById('formEndereco').addEventListener('submit', function(event) {
             let formValido = true;
             const campos = ['cep', 'logradouro', 'numero', 'bairro', 'cidade', 'estado'];
@@ -212,7 +208,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             });
             
-            // Verificar tipo de endereço selecionado
             if (!document.querySelector('input[name="tipo"]:checked')) {
                 formValido = false;
                 document.getElementById('cobranca').classList.add('is-invalid');
