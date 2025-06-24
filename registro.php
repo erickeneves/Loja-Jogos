@@ -16,15 +16,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'] ?? '';
     $confirmar_senha = $_POST['confirmar_senha'] ?? '';
     
+    // Limpar e validar CPF
+    $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
+    
     // Validações
     if (empty($nome)) $erros[] = "Nome é obrigatório.";
-    if (empty($cpf)) $erros[] = "CPF é obrigatório.";
-    elseif (!validarCPF($cpf)) $erros[] = "CPF inválido.";
+    if (empty($cpf_limpo)) $erros[] = "CPF é obrigatório.";
+    elseif (strlen($cpf_limpo) !== 11) $erros[] = "CPF deve conter 11 dígitos.";
+    elseif (!validarCPF($cpf_limpo)) $erros[] = "CPF inválido.";
     if (empty($email)) $erros[] = "Email é obrigatório.";
     elseif (!validarEmail($email)) $erros[] = "Email inválido.";
     if (empty($senha)) $erros[] = "Senha é obrigatória.";
     elseif (strlen($senha) < 6) $erros[] = "Senha deve ter pelo menos 6 caracteres.";
     elseif ($senha !== $confirmar_senha) $erros[] = "As senhas não coincidem.";
+    
+    // Verificar se CPF já existe
+    $stmt = $pdo->prepare("SELECT id_cliente FROM clientes WHERE cpf = ?");
+    $stmt->execute([$cpf_limpo]);
+    if ($stmt->fetch()) $erros[] = "Este CPF já está cadastrado.";
     
     // Verificar se email já existe
     $stmt = $pdo->prepare("SELECT id_cliente FROM clientes WHERE email = ?");
@@ -38,14 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "INSERT INTO clientes (nome, cpf, email, senha, data_cadastro) 
                 VALUES (?, ?, ?, ?, CURDATE())";
         $stmt = $pdo->prepare($sql);
-        if ($stmt->execute([$nome, $cpf, $email, $senha_hash])) {
+        if ($stmt->execute([$nome, $cpf_limpo, $email, $senha_hash])) {
             redirect('login.php', 'Registro realizado com sucesso! Faça login.');
         } else {
             $erros[] = "Erro ao cadastrar. Tente novamente.";
         }
     }
 }
-
 include 'header.php';
 ?>
 

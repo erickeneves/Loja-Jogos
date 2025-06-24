@@ -1,5 +1,4 @@
 <?php
-session_start();
 include '../includes/funcoes.php';
 include '../includes/conexao.php';
 

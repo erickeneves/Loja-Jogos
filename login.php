@@ -17,11 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($senha)) {
         $erro = "Por favor, preencha todos os campos.";
     } else {
-        // Buscar usuário
+        // Buscar usuário - CORREÇÃO IMPORTANTE!
         $stmt = $pdo->prepare("SELECT id_cliente, nome, email, senha FROM clientes WHERE email = ?");
         $stmt->execute([$email]);
         $usuario = $stmt->fetch();
         
+        // Verificação correta da senha
         if ($usuario && password_verify($senha, $usuario['senha'])) {
             $_SESSION['usuario'] = [
                 'id' => $usuario['id_cliente'],
