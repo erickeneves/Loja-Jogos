@@ -6,7 +6,6 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Ajustes para conteúdo em fundo escuro */
 .card {
     background: rgba(30, 30, 46, 0.8);
     color: #fff;

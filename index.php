@@ -4,7 +4,6 @@ include 'includes/funcoes.php';
 include 'includes/image-mapping.php';
 include 'header.php';
 
-// Consulta para obter apenas um registro por jogo (título)
 $sql = "SELECT 
             ANY_VALUE(j.id_jogo) AS id_jogo,
             j.titulo,
@@ -26,14 +25,11 @@ $produtos = $pdo->query($sql)->fetchAll();
     
     <div class="row">
         <?php foreach ($produtos as $produto): 
-            // Obter imagens para este jogo
             $images = getGameImages($produto['titulo']);
             
-            // Caminhos das imagens
             $primaryImage = "img/primary/" . $images['primary'];
             $altImage = "img/alternate/" . $images['alternate'];
             
-            // Verificar se as imagens existem
             if (!file_exists($primaryImage)) {
                 $primaryImage = "img/primary/default.png";
             }
@@ -44,20 +40,16 @@ $produtos = $pdo->query($sql)->fetchAll();
             <div class="col-lg-3 col-md-4 col-sm-6 mb-5">
                 <div class="game-container">
                     <div class="game-card">
-                        <!-- Imagem de fundo -->
                         <img src="<?= $primaryImage ?>" 
                              alt="<?= htmlspecialchars($produto['titulo']) ?>" 
                              class="background-image">
                         
-                        <!-- Imagem flutuante em 3D -->
                         <img src="<?= $altImage ?>" 
                              alt="<?= htmlspecialchars($produto['titulo']) ?>" 
                              class="floating-image">
                         
-                        <!-- Efeito de luz -->
                         <div class="card-light"></div>
                         
-                        <!-- Conteúdo do card -->
                         <div class="card-content">
                             <h5 class="game-title"><?= htmlspecialchars($produto['titulo']) ?></h5>
                             <p class="game-platform">

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Formata um valor monetário
+ * R$
  * @param float $valor
  * @return string
  */
@@ -10,7 +10,7 @@ function formatarMoeda($valor) {
 }
 
 /**
- * Formata uma data do banco (formato Y-m-d H:i:s) para o formato brasileiro
+ * form br data
  * @param string $data
  * @param bool $incluirHora
  * @return string
@@ -26,7 +26,7 @@ function formatarData($data, $incluirHora = false) {
 }
 
 /**
- * Retorna a classe CSS para o status do pedido
+ * status pedido
  * @param string $status
  * @return string
  */
@@ -42,7 +42,7 @@ function classeStatusPedido($status) {
 }
 
 /**
- * Formata o método de pagamento para um texto mais amigável
+ * txt pagaamento
  * @param string $metodo
  * @return string
  */
@@ -58,25 +58,21 @@ function formatarMetodoPagamento($metodo) {
 }
 
 /**
- * Valida um CPF
+ * valida CPF
  * @param string $cpf
  * @return bool
  */
 function validarCPF($cpf) {
-    // Remove caracteres não numéricos
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
     
-    // Verifica se foi informado todos os digitos corretamente
     if (strlen($cpf) != 11) {
         return false;
     }
 
-    // Verifica se é uma sequência de dígitos repetidos
     if (preg_match('/(\d)\1{10}/', $cpf)) {
         return false;
     }
 
-    // Faz o cálculo para validar o CPF
     for ($t = 9; $t < 11; $t++) {
         for ($d = 0, $c = 0; $c < $t; $c++) {
             $d += $cpf[$c] * (($t + 1) - $c);
@@ -90,7 +86,7 @@ function validarCPF($cpf) {
 }
 
 /**
- * Formata um CPF para o padrão XXX.XXX.XXX-XX
+ * form cpf
  * @param string $cpf
  * @return string
  */
@@ -103,7 +99,7 @@ function formatarCPF($cpf) {
 }
 
 /**
- * Formata um CEP para o padrão XXXXX-XXX
+ * form cep
  * @param string $cep
  * @return string
  */
@@ -113,7 +109,7 @@ function formatarCEP($cep) {
 }
 
 /**
- * Valida um e-mail
+ * validacao de email
  * @param string $email
  * @return bool
  */
@@ -122,7 +118,7 @@ function validarEmail($email) {
 }
 
 /**
- * Redireciona o usuário para uma URL com uma mensagem flash
+ * joga usuario com mensagem
  * @param string $url
  * @param string|null $mensagem
  * @param string $tipo
@@ -133,19 +129,17 @@ function redirect($url, $mensagem = null, $tipo = 'success') {
         $_SESSION['flash_tipo'] = $tipo;
     }
     
-    // Verifica se os headers já foram enviados
     if (!headers_sent()) {
         header("Location: $url");
         exit;
     } else {
-        // Fallback com JavaScript se os headers já foram enviados
         echo "<script>window.location.href='$url';</script>";
         exit;
     }
 }
 
 /**
- * Exibe uma mensagem flash se existir
+ * popup
  * @return string
  */
 function exibirMensagemFlash() {
@@ -160,7 +154,7 @@ function exibirMensagemFlash() {
 }
 
 /**
- * Gera uma URL amigável para um produto
+ * gerar url
  * @param string $nome
  * @return string
  */
@@ -172,7 +166,7 @@ function gerarSlug($nome) {
 }
 
 /**
- * Calcula o valor total de um pedido
+ * val total pedido
  * @param array $itens
  * @return float
  */
@@ -185,7 +179,7 @@ function calcularTotalPedido($itens) {
 }
 
 /**
- * Valida uma senha (mínimo 8 caracteres, com letra e número)
+ * senha 
  * @param string $senha
  * @return bool
  */

@@ -9,7 +9,7 @@ if (isset($_GET['remover'])) {
     $indice = (int)$_GET['remover'];
     if (isset($carrinho[$indice])) {
         unset($carrinho[$indice]);
-        $_SESSION['carrinho'] = array_values($carrinho); // Reindexa o array
+        $_SESSION['carrinho'] = array_values($carrinho);
     }
 }
 

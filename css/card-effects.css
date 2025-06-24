@@ -61,7 +61,6 @@
     text-shadow: 0 0 10px rgba(78, 255, 161, 0.4);
 }
 
-/* Imagem principal como fundo */
 .background-image {
     position: absolute;
     top: 0;
@@ -81,7 +80,6 @@
     filter: brightness(0.8) blur(2px);
 }
 
-/* Imagem secundária flutuante */
 .floating-image {
     position: absolute;
     top: 50%;
@@ -102,7 +100,6 @@
     transform: translate(-50%, -50%) translateZ(100px) scale(1.2);
 }
 
-/* Efeito de luz */
 .card-light {
     position: absolute;
     top: -50%;
