@@ -19,6 +19,7 @@ if (isset($_SESSION['carrinho']) && is_array($_SESSION['carrinho'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= $base_url ?>css/styles.css">
     <link rel="stylesheet" href="<?= $base_url ?>css/card-effects.css">
+    <link rel="icon" href="img/icon.png" type="image/x-icon">
     <style>
         body {
                 background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
