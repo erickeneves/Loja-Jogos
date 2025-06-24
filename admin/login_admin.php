@@ -1,34 +1,36 @@
 <?php
 session_start();
 include '../includes/funcoes.php';
+include '../includes/conexao.php';
 
 // Se o administrador já está logado, redireciona
-if (isset($_SESSION['admin'])) {
+if (isset($_SESSION['usuario']) && $_SESSION['usuario']['tipo'] === 'admin') {
     redirect('index.php');
 }
 
 // Processar login
+$erro = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
+    $email = trim($_POST['email'] ?? '');
     $senha = $_POST['senha'] ?? '';
     
     // Validação básica
     if (empty($email) || empty($senha)) {
         $erro = "Por favor, preencha todos os campos.";
     } else {
-        include '../includes/conexao.php';
-        $sql = "SELECT id_funcionario, nome, email, senha FROM funcionarios WHERE email = :email";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':email' => $email]);
+        // Buscar administrador
+        $stmt = $pdo->prepare("SELECT id_funcionario, nome, email, senha FROM funcionários WHERE email = ?");
+        $stmt->execute([$email]);
         $admin = $stmt->fetch();
         
         if ($admin && password_verify($senha, $admin['senha'])) {
-            $_SESSION['admin'] = [
+            $_SESSION['usuario'] = [
                 'id' => $admin['id_funcionario'],
                 'nome' => $admin['nome'],
-                'email' => $admin['email']
+                'email' => $admin['email'],
+                'tipo' => 'admin'
             ];
-            redirect('index.php', 'Login realizado com sucesso!');
+            redirect('index.php', 'Login de administrador realizado com sucesso!');
         } else {
             $erro = "Email ou senha incorretos.";
         }
@@ -126,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="login-body">
-                <?php if (isset($erro)): ?>
+                <?php if ($erro): ?>
                     <div class="alert alert-danger"><?= $erro ?></div>
                 <?php endif; ?>
                 

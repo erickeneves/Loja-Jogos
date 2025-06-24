@@ -1,6 +1,5 @@
 <?php
-// header.php
-ob_start(); // Inicia o buffer de saída
+ob_start();
 session_start();
 ?>
 <!DOCTYPE html>
@@ -120,10 +119,16 @@ session_start();
             font-weight: bold;
             color: #4CAF50;
         }
+        .badge-admin {
+            background-color: #dc3545;
+            font-size: 0.6rem;
+            vertical-align: super;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="index.php">
                 <img src="img/bannerpng.png" alt="GameRent" class="logo-header">
@@ -136,9 +141,28 @@ session_start();
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/login_admin.php">Admin</a>
-                    </li>
+                    
+                    <?php if (isset($_SESSION['usuario'])): ?>
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                <?= htmlspecialchars($_SESSION['usuario']['nome']) ?>
+                                <?php if ($_SESSION['usuario']['tipo'] === 'admin'): ?>
+                                    <span class="badge badge-admin">Admin</span>
+                                <?php endif; ?>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout.php">Sair</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin/login_admin.php">Admin</a>
+                        </li>
+                    <?php endif; ?>
+                    
                     <li class="nav-item">
                         <a class="nav-link carrinho-link" href="carrinho.php">
                             <i class="bi bi-cart"></i>

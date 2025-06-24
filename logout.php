@@ -1,15 +1,5 @@
 <?php
-include 'includes/funcoes.php';
-
 session_start();
-
-// Destruir todas as variáveis de sessão
-$_SESSION = array();
-
-// Destruir a sessão
+session_unset();
 session_destroy();
-
-// Redirecionar para página inicial
-header('Location: index.php');
-exit;
-?>
+redirect('index.php', 'Você saiu da sua conta.');

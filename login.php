@@ -1,5 +1,6 @@
 <?php
 include 'includes/funcoes.php';
+include 'includes/conexao.php';
 
 // Se o usuário já está logado, redireciona
 if (isset($_SESSION['usuario'])) {
@@ -7,25 +8,26 @@ if (isset($_SESSION['usuario'])) {
 }
 
 // Processar login
+$erro = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
+    $email = trim($_POST['email'] ?? '');
     $senha = $_POST['senha'] ?? '';
     
     // Validação básica
     if (empty($email) || empty($senha)) {
         $erro = "Por favor, preencha todos os campos.";
     } else {
-        include 'includes/conexao.php';
-        $sql = "SELECT id_cliente, nome, email, senha FROM clientes WHERE email = :email";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':email' => $email]);
+        // Buscar usuário
+        $stmt = $pdo->prepare("SELECT id_cliente, nome, email, senha FROM clientes WHERE email = ?");
+        $stmt->execute([$email]);
         $usuario = $stmt->fetch();
         
         if ($usuario && password_verify($senha, $usuario['senha'])) {
             $_SESSION['usuario'] = [
                 'id' => $usuario['id_cliente'],
                 'nome' => $usuario['nome'],
-                'email' => $usuario['email']
+                'email' => $usuario['email'],
+                'tipo' => 'usuario'
             ];
             redirect('index.php', 'Login realizado com sucesso!');
         } else {
@@ -49,7 +51,7 @@ include 'header.php';
                         <div class="card-body p-5">
                             <h2 class="card-title text-center mb-4">Login de Usuário</h2>
                             
-                            <?php if (isset($erro)): ?>
+                            <?php if ($erro): ?>
                                 <div class="alert alert-danger"><?= $erro ?></div>
                             <?php endif; ?>
                             
