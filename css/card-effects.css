@@ -1,0 +1,121 @@
+.logo-header{
+    height: 100px;
+}
+.game-container {
+    perspective: 1500px;
+    margin-bottom: 100px;
+}
+
+.game-card {
+    position: relative;
+    border-radius: 15px;
+    overflow: visible;
+    height: 380px;
+    width: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.game-card:hover {
+    transform: translateY(-20px);
+}
+
+.card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(30, 30, 46, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    z-index: 5;
+    transform: translateZ(30px);
+    transition: all 0.6s ease;
+}
+
+.game-card:hover .card-content {
+    background: rgba(13, 42, 89, 0.9);
+    transform: translateZ(50px);
+}
+
+.game-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: white;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.game-platform {
+    font-size: 0.95rem;
+    color: #a0a0f0;
+    margin-bottom: 10px;
+}
+
+.game-price {
+    font-weight: bold;
+    color: #4effa1;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(78, 255, 161, 0.4);
+}
+
+/* Imagem principal como fundo */
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+    transform: translateZ(0);
+    transition: all 0.8s ease;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    z-index: 1;
+}
+
+.game-card:hover .background-image {
+    transform: translateZ(-20px) scale(1.05);
+    filter: brightness(0.8) blur(2px);
+}
+
+/* Imagem secundária flutuante */
+.floating-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: translate(-50%, -50%) translateZ(0) scale(0.9);
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.6);
+    opacity: 0;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+    z-index: 3;
+    pointer-events: none;
+}
+
+.game-card:hover .floating-image {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateZ(100px) scale(1.2);
+}
+
+/* Efeito de luz */
+.card-light {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.game-card:hover .card-light {
+    opacity: 1;
+}
