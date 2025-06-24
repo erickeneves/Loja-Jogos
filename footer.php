@@ -20,8 +20,8 @@
                 
                 <div class="col-md-4">
                     <h5>Contato</h5>
-                    <p><i class="bi bi-envelope me-2"></i> contato@gamerent.com</p>
-                    <p><i class="bi bi-whatsapp me-2"></i> (11) 99999-9999</p>
+                    <p><i class="bi bi-envelope me-2"></i> erickedu211@gmail.com</p>
+                    <p><i class="bi bi-whatsapp me-2"></i> (14) 98836-4827</p>
                 </div>
             </div>
             

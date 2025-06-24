@@ -45,9 +45,8 @@ $imageMapping = [
 function getGameImages($gameTitle) {
     global $imageMapping;
     
-    // Normaliza o título para a chave do array
     $key = strtolower(str_replace([' ', ':', "'", ','], ['_', '', '', ''], $gameTitle));
-    $key = str_replace('__', '_', $key); // Remove duplos underscores
+    $key = str_replace('__', '_', $key);
     
     if (isset($imageMapping[$key])) {
         return [
@@ -56,10 +55,9 @@ function getGameImages($gameTitle) {
         ];
     }
     
-    // Retorno padrão se não encontrar
     return [
-        'primary' => 'default.png',
-        'alternate' => 'default.png'
+        'primary' => 'sem_imagem.png',
+        'alternate' => 'sem_imagem.png'
     ];
 }
 ?>
